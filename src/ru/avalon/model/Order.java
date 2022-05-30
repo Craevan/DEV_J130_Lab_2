@@ -3,6 +3,7 @@ package ru.avalon.model;
 import ru.avalon.utils.DateUtil;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class Order {
 
@@ -29,12 +30,18 @@ public class Order {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Order order)) return false;
+        if (!(o instanceof Order)) return false;
+        Order order = (Order) o;
         if (id != order.id) return false;
         if (orderState != order.orderState) return false;
         if (!creationDate.equals(order.creationDate)) return false;
         if (!customerName.equals(order.customerName)) return false;
-        return customerAddress.equals(order.customerAddress);
+        if (!Objects.equals(customerPhone, order.customerPhone))
+            return false;
+        if (!Objects.equals(customerEmail, order.customerEmail))
+            return false;
+        if (!customerAddress.equals(order.customerAddress)) return false;
+        return Objects.equals(shipmentDate, order.shipmentDate);
     }
 
     @Override
@@ -42,8 +49,11 @@ public class Order {
         int result = id;
         result = 31 * result + creationDate.hashCode();
         result = 31 * result + customerName.hashCode();
+        result = 31 * result + (customerPhone != null ? customerPhone.hashCode() : 0);
+        result = 31 * result + (customerEmail != null ? customerEmail.hashCode() : 0);
         result = 31 * result + customerAddress.hashCode();
         result = 31 * result + (int) orderState;
+        result = 31 * result + (shipmentDate != null ? shipmentDate.hashCode() : 0);
         return result;
     }
 
