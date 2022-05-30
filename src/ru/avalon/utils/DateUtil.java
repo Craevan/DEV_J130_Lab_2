@@ -1,4 +1,4 @@
-package ru.avalon.model.utils;
+package ru.avalon.utils;
 
 import java.time.format.DateTimeFormatter;
 

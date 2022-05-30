@@ -1,6 +1,6 @@
 package ru.avalon.model;
 
-import ru.avalon.model.utils.DateUtil;
+import ru.avalon.utils.DateUtil;
 
 import java.time.LocalDate;
 
