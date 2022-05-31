@@ -16,7 +16,7 @@ public class DBServer implements IDataBase {
     private Statement statement;
     private ResultSet resultSet;
 
-    private String testUrl = "jdbc:derby:/home/user/Documents/java/AvalonTestDB";
+    private String testUrl = "jdbc:derby:/home/user211/Coding/TestDB/AvalonDB_Test";
     private String testCred = "derby";
 
     private DBServer() {
@@ -64,8 +64,10 @@ public class DBServer implements IDataBase {
         getDBConnection();
         try {
             checkStatement();
-            resultSet = statement.executeQuery("SELECT * FROM products");
-            return fillList(resultSet);
+            resultSet = statement.executeQuery("SELECT * FROM products;");
+            List<Product> products = fillList(resultSet);
+            resultSet.close();
+            return products;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -81,8 +83,10 @@ public class DBServer implements IDataBase {
         try {
             checkStatement();
             resultSet = statement.executeQuery("SELECT * FROM PRODUCTS" +
-                    " JOIN Positions ON Positions.product_art_number = Products.art_number WHERE order_id = " + id);
-            return fillList(resultSet);
+                    " JOIN Positions ON Positions.product_art_number = Products.art_number WHERE order_id = " + id + ";");
+            List<Product> products = fillList(resultSet);
+            resultSet.close();
+            return products;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -92,6 +96,33 @@ public class DBServer implements IDataBase {
     @Override
     public boolean addOrder(Order order) {
         //TODO
+        if (order == null) {
+            throw new IllegalArgumentException("Аргумент не может быть null");
+        }
+        if (order.getId() < 0 ||
+                order.getCreationDate() == null ||
+                order.getCustomerName() == null ||
+                order.getCustomerPhone() == null ||
+                order.getCustomerAddress() == null ) {
+            throw new IllegalArgumentException("Номер заказа должен быть > 0; Заказ должен содержать информацию о клиенте");
+        }
+        try {
+            getDBConnection();
+            checkStatement();
+            statement.executeQuery("INSERT INTO orders VALUES (" +
+                    order.getId() + ", '" +
+                    order.getCreationDate() + "', '" +
+                    order.getCustomerName() + "', '" +
+                    order.getCustomerPhone() + "', '" +
+                    order.getCustomerEmail() + "', '" +
+                    order.getCustomerAddress() + "', '" +
+                    order.getOrderState() + "' , '" +
+                    order.getShipmentDate() + "')"
+                    );
+            return true;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         return false;
     }
 

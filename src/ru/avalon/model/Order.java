@@ -8,7 +8,7 @@ import java.util.Objects;
 public class Order {
 
     private int id;
-    private LocalDate creationDate;
+    private String creationDate;
     private String customerName;
     private String customerPhone;
     private String customerEmail;
@@ -25,6 +25,38 @@ public class Order {
         this.customerEmail = orderBuilder.getCustomerEmail();
         this.customerAddress = orderBuilder.getCustomerAddress();
         this.orderState = orderBuilder.getOrderState();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getCustomerPhone() {
+        return customerPhone;
+    }
+
+    public String getCustomerEmail() {
+        return customerEmail;
+    }
+
+    public String getCustomerAddress() {
+        return customerAddress;
+    }
+
+    public char getOrderState() {
+        return orderState;
+    }
+
+    public LocalDate getShipmentDate() {
+        return shipmentDate;
     }
 
     @Override
@@ -74,7 +106,7 @@ public class Order {
     public static class OrderBuilder {
 
         private int id;
-        private LocalDate creationDate;
+        private String creationDate;
         private String customerName;
         private String customerPhone;
         private String customerEmail;
@@ -87,7 +119,7 @@ public class Order {
         }
 
         public OrderBuilder creationDate(String date) {
-            this.creationDate = LocalDate.parse(date, DateUtil.DTF);
+            this.creationDate = date;
             return this;
         }
 
@@ -128,7 +160,7 @@ public class Order {
             return id;
         }
 
-        private LocalDate getCreationDate() {
+        private String getCreationDate() {
             return creationDate;
         }
 
