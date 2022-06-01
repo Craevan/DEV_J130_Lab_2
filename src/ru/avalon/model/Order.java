@@ -1,5 +1,6 @@
 package ru.avalon.model;
 
+import org.apache.derby.iapi.types.SQLDate;
 import ru.avalon.utils.DateUtil;
 
 import java.time.LocalDate;
@@ -9,12 +10,13 @@ public class Order {
 
     private int id;
     private String creationDate;
+    private SQLDate creationDateSQL;
     private String customerName;
     private String customerPhone;
     private String customerEmail;
     private String customerAddress;
     private char orderState;
-    private LocalDate shipmentDate;
+    private String shipmentDate;
 
     // Чтобы не создавать конструктор с кучей идущих подряд String, реализуем Builder
     private Order(OrderBuilder orderBuilder) {
@@ -25,6 +27,7 @@ public class Order {
         this.customerEmail = orderBuilder.getCustomerEmail();
         this.customerAddress = orderBuilder.getCustomerAddress();
         this.orderState = orderBuilder.getOrderState();
+        this.shipmentDate = orderBuilder.getShipmentDate();
     }
 
     public int getId() {
@@ -55,7 +58,7 @@ public class Order {
         return orderState;
     }
 
-    public LocalDate getShipmentDate() {
+    public String getShipmentDate() {
         return shipmentDate;
     }
 
@@ -112,6 +115,7 @@ public class Order {
         private String customerEmail;
         private String customerAddress;
         private char orderState;
+        private String shipmentDate;
 
         public OrderBuilder id(int id) {
             this.id = id;
@@ -156,6 +160,11 @@ public class Order {
             }
         }
 
+        public OrderBuilder shipmentDate() {
+            shipmentDate = "2022-02-03";
+            return this;
+        }
+
         private int getId() {
             return id;
         }
@@ -182,6 +191,10 @@ public class Order {
 
         private char getOrderState() {
             return orderState;
+        }
+
+        public String getShipmentDate() {
+            return shipmentDate;
         }
 
         public Order build() {

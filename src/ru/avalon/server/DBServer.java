@@ -16,7 +16,7 @@ public class DBServer implements IDataBase {
     private Statement statement;
     private ResultSet resultSet;
 
-    private String testUrl = "jdbc:derby:/home/user211/Coding/TestDB/AvalonDB_Test";
+    private String testUrl = "jdbc:derby:/home/user/Документы/Avalontest_DB";
     private String testCred = "derby";
 
     private DBServer() {
@@ -109,7 +109,7 @@ public class DBServer implements IDataBase {
         try {
             getDBConnection();
             checkStatement();
-            statement.executeQuery("INSERT INTO orders VALUES (" +
+            String query = "INSERT INTO orders VALUES (" +
                     order.getId() + ", '" +
                     order.getCreationDate() + "', '" +
                     order.getCustomerName() + "', '" +
@@ -117,8 +117,9 @@ public class DBServer implements IDataBase {
                     order.getCustomerEmail() + "', '" +
                     order.getCustomerAddress() + "', '" +
                     order.getOrderState() + "' , '" +
-                    order.getShipmentDate() + "')"
-                    );
+                    order.getShipmentDate() + "')";
+            System.out.println(query);
+            statement.executeUpdate(query);
             return true;
         } catch (SQLException ex) {
             ex.printStackTrace();
