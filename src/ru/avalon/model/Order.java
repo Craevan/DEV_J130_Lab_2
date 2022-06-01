@@ -1,22 +1,18 @@
 package ru.avalon.model;
 
-import org.apache.derby.iapi.types.SQLDate;
-import ru.avalon.utils.DateUtil;
-
 import java.time.LocalDate;
 import java.util.Objects;
 
 public class Order {
 
-    private int id;
-    private String creationDate;
-    private SQLDate creationDateSQL;
+    private final int id;
+    private final LocalDate creationDate;
     private String customerName;
     private String customerPhone;
     private String customerEmail;
     private String customerAddress;
     private char orderState;
-    private String shipmentDate;
+    private LocalDate shipmentDate;
 
     // Чтобы не создавать конструктор с кучей идущих подряд String, реализуем Builder
     private Order(OrderBuilder orderBuilder) {
@@ -34,7 +30,7 @@ public class Order {
         return id;
     }
 
-    public String getCreationDate() {
+    public LocalDate getCreationDate() {
         return creationDate;
     }
 
@@ -58,7 +54,7 @@ public class Order {
         return orderState;
     }
 
-    public String getShipmentDate() {
+    public LocalDate getShipmentDate() {
         return shipmentDate;
     }
 
@@ -109,21 +105,21 @@ public class Order {
     public static class OrderBuilder {
 
         private int id;
-        private String creationDate;
+        private LocalDate creationDate;
         private String customerName;
         private String customerPhone;
         private String customerEmail;
         private String customerAddress;
         private char orderState;
-        private String shipmentDate;
+        private LocalDate shipmentDate;
 
         public OrderBuilder id(int id) {
             this.id = id;
             return this;
         }
 
-        public OrderBuilder creationDate(String date) {
-            this.creationDate = date;
+        public OrderBuilder creationDate() {
+            this.creationDate = LocalDate.now();
             return this;
         }
 
@@ -161,7 +157,12 @@ public class Order {
         }
 
         public OrderBuilder shipmentDate() {
-            shipmentDate = "2022-02-03";
+            if (orderState == 'S') {
+                shipmentDate = LocalDate.now();
+            }
+            else {
+                shipmentDate = null;
+            }
             return this;
         }
 
@@ -169,7 +170,7 @@ public class Order {
             return id;
         }
 
-        private String getCreationDate() {
+        private LocalDate getCreationDate() {
             return creationDate;
         }
 
@@ -193,7 +194,7 @@ public class Order {
             return orderState;
         }
 
-        public String getShipmentDate() {
+        public LocalDate getShipmentDate() {
             return shipmentDate;
         }
 

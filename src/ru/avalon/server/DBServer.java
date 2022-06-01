@@ -2,22 +2,23 @@ package ru.avalon.server;
 
 import ru.avalon.model.Order;
 import ru.avalon.model.Product;
-import ru.avalon.utils.Crypt;
+import ru.avalon.utils.ConsoleHelper;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 //реализуем сервер через ClassHolder Singleton
-public class DBServer implements IDataBase {
+public class DBServer implements IDataBase<Product, Order> {
 
     private Connection connection;
     private Statement statement;
     private ResultSet resultSet;
-
-    private String testUrl = "jdbc:derby:/home/user/Документы/Avalontest_DB";
-    private String testCred = "derby";
+    private final Properties properties = new Properties();
 
     private DBServer() {
     }
@@ -32,10 +33,17 @@ public class DBServer implements IDataBase {
 
     public void getDBConnection() {
         if (connection == null) {
-            try {
-                connection = DriverManager.getConnection(testUrl, testCred, testCred);
+            try (FileReader fReader = new FileReader("src/ru/avalon/resources/Credentials.properties")) {
+                properties.load(fReader);
+                connection = DriverManager.getConnection(properties.getProperty("db.host"),
+                        properties.getProperty("db.login"),
+                        properties.getProperty("db.password"));
             } catch (SQLException e) {
-                e.printStackTrace();
+                ConsoleHelper.writeErrorMessage("Ошибка при подключении к БД");
+            } catch (FileNotFoundException e) {
+                ConsoleHelper.writeErrorMessage("Не найден файл настроек");
+            } catch (IOException e) {
+                ConsoleHelper.writeErrorMessage("Ошибка ввода/вывода");
             }
         }
     }
@@ -64,7 +72,7 @@ public class DBServer implements IDataBase {
         getDBConnection();
         try {
             checkStatement();
-            resultSet = statement.executeQuery("SELECT * FROM products;");
+            resultSet = statement.executeQuery("SELECT * FROM products");
             List<Product> products = fillList(resultSet);
             resultSet.close();
             return products;
@@ -75,7 +83,7 @@ public class DBServer implements IDataBase {
     }
 
     @Override
-    public List<Product> getProductsFromOrder(int id) {
+    public List<Product> getProductsByID(int id) {
         getDBConnection();
         if (id <= 0) {
             return null;
@@ -83,7 +91,7 @@ public class DBServer implements IDataBase {
         try {
             checkStatement();
             resultSet = statement.executeQuery("SELECT * FROM PRODUCTS" +
-                    " JOIN Positions ON Positions.product_art_number = Products.art_number WHERE order_id = " + id + ";");
+                    " JOIN Positions ON Positions.product_art_number = Products.art_number WHERE order_id = " + id);
             List<Product> products = fillList(resultSet);
             resultSet.close();
             return products;
@@ -94,8 +102,7 @@ public class DBServer implements IDataBase {
     }
 
     @Override
-    public boolean addOrder(Order order) {
-        //TODO
+    public void addRow(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Аргумент не может быть null");
         }
@@ -103,28 +110,39 @@ public class DBServer implements IDataBase {
                 order.getCreationDate() == null ||
                 order.getCustomerName() == null ||
                 order.getCustomerPhone() == null ||
-                order.getCustomerAddress() == null ) {
+                order.getCustomerAddress() == null) {
             throw new IllegalArgumentException("Номер заказа должен быть > 0; Заказ должен содержать информацию о клиенте");
         }
         try {
             getDBConnection();
             checkStatement();
-            String query = "INSERT INTO orders VALUES (" +
-                    order.getId() + ", '" +
-                    order.getCreationDate() + "', '" +
-                    order.getCustomerName() + "', '" +
-                    order.getCustomerPhone() + "', '" +
-                    order.getCustomerEmail() + "', '" +
-                    order.getCustomerAddress() + "', '" +
-                    order.getOrderState() + "' , '" +
-                    order.getShipmentDate() + "')";
-            System.out.println(query);
+            String query;
+            if (order.getShipmentDate() != null) {
+                query = "INSERT INTO orders VALUES (" +
+                        order.getId() + ", '" +
+                        order.getCreationDate() + "', '" +
+                        order.getCustomerName() + "', '" +
+                        order.getCustomerPhone() + "', '" +
+                        order.getCustomerEmail() + "', '" +
+                        order.getCustomerAddress() + "', '" +
+                        order.getOrderState() + "' , '" +
+                        order.getShipmentDate() + "')";
+            }
+            else {
+                query = "INSERT INTO orders VALUES (" +
+                        order.getId() + ", '" +
+                        order.getCreationDate() + "', '" +
+                        order.getCustomerName() + "', '" +
+                        order.getCustomerPhone() + "', '" +
+                        order.getCustomerEmail() + "', '" +
+                        order.getCustomerAddress() + "', '" +
+                        order.getOrderState() + "' , " +
+                        order.getShipmentDate() + ")";
+            }
             statement.executeUpdate(query);
-            return true;
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            ConsoleHelper.writeErrorMessage("Ошибка при добавлении записи в БД");
         }
-        return false;
     }
 
     @Override

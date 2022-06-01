@@ -102,7 +102,6 @@ FROM Orders
 WHERE order_state = 'S'
 GROUP BY id;
 
-
 -- Напишите запрос, фиксирующий отгрузку заказа с id=5 --
 UPDATE Orders
 SET order_state   = 'S',

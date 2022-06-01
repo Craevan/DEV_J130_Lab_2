@@ -11,6 +11,10 @@ public class ConsoleHelper {
         System.out.println(message);
     }
 
+    public static void writeErrorMessage(String message) {
+        System.err.println(message);
+    }
+
     public static <T> void writeMessage(List<T> list) {
         if (list.isEmpty()) {
             System.err.println("Запрос вернул пустой список");
@@ -21,8 +25,6 @@ public class ConsoleHelper {
 
     public static String readLine() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String text = reader.readLine();
-        reader.close();
-        return text;
+        return reader.readLine();
     }
 }
